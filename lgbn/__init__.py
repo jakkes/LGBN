@@ -1,0 +1,1 @@
+"""Linear Gaussian Belief Networks."""
