@@ -1,4 +1,4 @@
-# LGBN
-[![Build Status](http://drone.jakke.se/api/badges/jakkes/LGBN/status.svg)](http://drone.jakke.se/jakkes/LGBN)
+# PGM
+[![Build Status](http://drone.jakke.se/api/badges/jakkes/LGBN/status.svg)](http://drone.jakke.se/jakkes/PGM)
 
-Linear Gaussian Belief Networks.
+Probabilistic Graphical Models.
