@@ -9,6 +9,7 @@ __all__ = ["distributions"]
 
 def _fix_pdoc():
     import os
+    import queue
     from types import ModuleType
 
     root = os.path.dirname(__file__)
