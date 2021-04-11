@@ -33,10 +33,11 @@
 from ._base import Base
 from . import conditional
 
+from ._discrete import Discrete
 from ._gaussian import Gaussian
 
 
-__all__ = [&#34;Base&#34;, &#34;conditional&#34;, &#34;Gaussian&#34;]</code></pre>
+__all__ = [&#34;Base&#34;, &#34;conditional&#34;, &#34;Gaussian&#34;, &#34;Discrete&#34;]</code></pre>
 </details>
 </section>
 <section>
@@ -73,6 +74,7 @@ Output variables are ordered, and thus identifiable, by these names.</dd>
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li>ai.distributions.Discrete</li>
 <li>ai.distributions.Gaussian</li>
 </ul>
 <h3>Instance variables</h3>
@@ -140,6 +142,87 @@ def sample(self, batches: Optional[int] = None) -&gt; np.ndarray:
             contains multiple samples stacked in the first dimension.
     &#34;&#34;&#34;
     raise NotImplementedError</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pgm.distributions.Discrete"><code class="flex name class">
+<span>class <span class="ident">Discrete</span></span>
+<span>(</span><span>values: Sequence[Tuple[float, ...]], probabilities: Sequence[float], variable_names: Sequence[str])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Discrete multivariate distribution.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>values</code></strong> :&ensp;<code>Sequence[Tuple[float, &hellip;]]</code></dt>
+<dd>Values obtainable in the distribution.</dd>
+<dt><strong><code>probabilities</code></strong> :&ensp;<code>Sequence[float]</code></dt>
+<dd>Probabilities of each value.</dd>
+<dt><strong><code>variable_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
+<dd>Names of the variables.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>ai.distributions.Base</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pgm.distributions.Discrete.probabilities"><code class="name">var <span class="ident">probabilities</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"><p>Probabilities of taking each value.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def probabilities(self) -&gt; np.ndarray:
+    &#34;&#34;&#34;Probabilities of taking each value.&#34;&#34;&#34;
+    return self._probabilities.copy()</code></pre>
+</details>
+</dd>
+<dt id="pgm.distributions.Discrete.values"><code class="name">var <span class="ident">values</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"><p>Values obtainable by the distribution.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def values(self) -&gt; np.ndarray:
+    &#34;&#34;&#34;Values obtainable by the distribution.&#34;&#34;&#34;
+    return self._values.copy()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pgm.distributions.Discrete.sample"><code class="name flex">
+<span>def <span class="ident">sample</span></span>(<span>self, batches: Union[int, NoneType] = None) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Samples from the distribution.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>batches</code></strong> :&ensp;<code>Optional[int]</code>, optional</dt>
+<dd>If not None, multiple samples are generated and
+stacked. Defaults to None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>Sampled values. If <code>batches</code> is not None, then the output
+contains multiple samples stacked in the first dimension.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample(self, batches: Optional[int] = None) -&gt; np.ndarray:
+    i = np.random.choice(
+        self.dim, size=batches, replace=True, p=self._probabilities
+    )
+    return self.values[i]</code></pre>
 </details>
 </dd>
 </dl>
@@ -251,6 +334,14 @@ contains multiple samples stacked in the first dimension.</dd>
 <li><code><a title="pgm.distributions.Base.dim" href="#pgm.distributions.Base.dim">dim</a></code></li>
 <li><code><a title="pgm.distributions.Base.sample" href="#pgm.distributions.Base.sample">sample</a></code></li>
 <li><code><a title="pgm.distributions.Base.variable_names" href="#pgm.distributions.Base.variable_names">variable_names</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pgm.distributions.Discrete" href="#pgm.distributions.Discrete">Discrete</a></code></h4>
+<ul class="">
+<li><code><a title="pgm.distributions.Discrete.probabilities" href="#pgm.distributions.Discrete.probabilities">probabilities</a></code></li>
+<li><code><a title="pgm.distributions.Discrete.sample" href="#pgm.distributions.Discrete.sample">sample</a></code></li>
+<li><code><a title="pgm.distributions.Discrete.values" href="#pgm.distributions.Discrete.values">values</a></code></li>
 </ul>
 </li>
 <li>
