@@ -6,13 +6,13 @@ with open("VERSION", "r") as f:
     version = f.read()
 
 setuptools.setup(
-    name="lgbn",
+    name="pgm",
     version=version,
     author="Jakob Stigenberg",
     description="Linear Gaussian Belief Networks",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/jakkes/LGBN",
+    url="https://github.com/jakkes/PGM",
     packages=setuptools.find_packages(),
     classifiers=(
         "Programming Language :: Python :: 3",

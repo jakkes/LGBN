@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>lgbn.distributions API documentation</title>
+<title>pgm.distributions API documentation</title>
 <meta name="description" content="Definitions of distributions." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>lgbn.distributions</code></h1>
+<h1 class="title">Module <code>pgm.distributions</code></h1>
 </header>
 <section id="section-intro">
 <p>Definitions of distributions.</p>
@@ -46,7 +46,7 @@ __all__ = [&#34;Base&#34;, &#34;Gaussian&#34;]</code></pre>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="lgbn.distributions.Base"><code class="flex name class">
+<dt id="pgm.distributions.Base"><code class="flex name class">
 <span>class <span class="ident">Base</span></span>
 <span>(</span><span>variable_names: Sequence[str])</span>
 </code></dt>
@@ -68,7 +68,7 @@ Output variables are ordered, and thus identifiable, by these names.</dd>
 </ul>
 <h3>Instance variables</h3>
 <dl>
-<dt id="lgbn.distributions.Base.dim"><code class="name">var <span class="ident">dim</span> : int</code></dt>
+<dt id="pgm.distributions.Base.dim"><code class="name">var <span class="ident">dim</span> : int</code></dt>
 <dd>
 <div class="desc"><p>Dimension in which the distribution generates samples.</p></div>
 <details class="source">
@@ -81,7 +81,7 @@ def dim(self) -&gt; int:
     return len(self._variable_names)</code></pre>
 </details>
 </dd>
-<dt id="lgbn.distributions.Base.variable_names"><code class="name">var <span class="ident">variable_names</span> : List[str]</code></dt>
+<dt id="pgm.distributions.Base.variable_names"><code class="name">var <span class="ident">variable_names</span> : List[str]</code></dt>
 <dd>
 <div class="desc"><p>Variable names of outputs.</p></div>
 <details class="source">
@@ -97,7 +97,7 @@ def variable_names(self) -&gt; List[str]:
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="lgbn.distributions.Base.sample"><code class="name flex">
+<dt id="pgm.distributions.Base.sample"><code class="name flex">
 <span>def <span class="ident">sample</span></span>(<span>self, batches: Union[int, NoneType] = None) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
@@ -135,7 +135,7 @@ def sample(self, batches: Optional[int] = None) -&gt; np.ndarray:
 </dd>
 </dl>
 </dd>
-<dt id="lgbn.distributions.Gaussian"><code class="flex name class">
+<dt id="pgm.distributions.Gaussian"><code class="flex name class">
 <span>class <span class="ident">Gaussian</span></span>
 <span>(</span><span>mean: numpy.ndarray, covariance: numpy.ndarray, variable_names: Union[Sequence[str], NoneType] = None)</span>
 </code></dt>
@@ -159,7 +159,7 @@ variable as "0", "1", "2", &hellip;</dd>
 </ul>
 <h3>Instance variables</h3>
 <dl>
-<dt id="lgbn.distributions.Gaussian.covariance"><code class="name">var <span class="ident">covariance</span> : numpy.ndarray</code></dt>
+<dt id="pgm.distributions.Gaussian.covariance"><code class="name">var <span class="ident">covariance</span> : numpy.ndarray</code></dt>
 <dd>
 <div class="desc"><p>Covariance matrix.</p></div>
 <details class="source">
@@ -172,7 +172,7 @@ def covariance(self) -&gt; np.ndarray:
     return self._cov.copy()</code></pre>
 </details>
 </dd>
-<dt id="lgbn.distributions.Gaussian.mean"><code class="name">var <span class="ident">mean</span> : numpy.ndarray</code></dt>
+<dt id="pgm.distributions.Gaussian.mean"><code class="name">var <span class="ident">mean</span> : numpy.ndarray</code></dt>
 <dd>
 <div class="desc"><p>Mean vector.</p></div>
 <details class="source">
@@ -188,7 +188,7 @@ def mean(self) -&gt; np.ndarray:
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="lgbn.distributions.Gaussian.sample"><code class="name flex">
+<dt id="pgm.distributions.Gaussian.sample"><code class="name flex">
 <span>def <span class="ident">sample</span></span>(<span>self, batches: Union[int, NoneType] = None) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
@@ -226,25 +226,25 @@ contains multiple samples stacked in the first dimension.</dd>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="lgbn" href="../index.html">lgbn</a></code></li>
+<li><code><a title="pgm" href="../index.html">pgm</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="lgbn.distributions.Base" href="#lgbn.distributions.Base">Base</a></code></h4>
+<h4><code><a title="pgm.distributions.Base" href="#pgm.distributions.Base">Base</a></code></h4>
 <ul class="">
-<li><code><a title="lgbn.distributions.Base.dim" href="#lgbn.distributions.Base.dim">dim</a></code></li>
-<li><code><a title="lgbn.distributions.Base.sample" href="#lgbn.distributions.Base.sample">sample</a></code></li>
-<li><code><a title="lgbn.distributions.Base.variable_names" href="#lgbn.distributions.Base.variable_names">variable_names</a></code></li>
+<li><code><a title="pgm.distributions.Base.dim" href="#pgm.distributions.Base.dim">dim</a></code></li>
+<li><code><a title="pgm.distributions.Base.sample" href="#pgm.distributions.Base.sample">sample</a></code></li>
+<li><code><a title="pgm.distributions.Base.variable_names" href="#pgm.distributions.Base.variable_names">variable_names</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="lgbn.distributions.Gaussian" href="#lgbn.distributions.Gaussian">Gaussian</a></code></h4>
+<h4><code><a title="pgm.distributions.Gaussian" href="#pgm.distributions.Gaussian">Gaussian</a></code></h4>
 <ul class="">
-<li><code><a title="lgbn.distributions.Gaussian.covariance" href="#lgbn.distributions.Gaussian.covariance">covariance</a></code></li>
-<li><code><a title="lgbn.distributions.Gaussian.mean" href="#lgbn.distributions.Gaussian.mean">mean</a></code></li>
-<li><code><a title="lgbn.distributions.Gaussian.sample" href="#lgbn.distributions.Gaussian.sample">sample</a></code></li>
+<li><code><a title="pgm.distributions.Gaussian.covariance" href="#pgm.distributions.Gaussian.covariance">covariance</a></code></li>
+<li><code><a title="pgm.distributions.Gaussian.mean" href="#pgm.distributions.Gaussian.mean">mean</a></code></li>
+<li><code><a title="pgm.distributions.Gaussian.sample" href="#pgm.distributions.Gaussian.sample">sample</a></code></li>
 </ul>
 </li>
 </ul>

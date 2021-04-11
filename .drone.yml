@@ -10,8 +10,8 @@ steps:
   - pip install . pdoc3
   - pip install -r requirements.txt
   - pytest
-  - rm -rf ./docs/lgbn/
-  - pdoc3 ./lgbn --html -o docs
+  - rm -rf ./docs/pgm/
+  - pdoc3 ./pgm --html -o docs
 
 - name: push
   image: alpine/git
