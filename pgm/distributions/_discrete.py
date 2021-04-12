@@ -10,23 +10,19 @@ class Discrete(distributions.Base):
 
     def __init__(
         self,
-        values: Sequence[Tuple[float, ...]],
+        values: Sequence[float],
         probabilities: Sequence[float],
-        variable_names: Sequence[str],
     ):
         """
         Args:
-            values (Sequence[Tuple[float, ...]]): Values obtainable in the distribution.
+            values (Sequence[float]): Values obtainable in the distribution.
             probabilities (Sequence[float]): Probabilities of each value.
-            variable_names (Sequence[str]): Names of the variables.
         """
-        super().__init__(variable_names)
-        self._values = np.asarray(values, dtype=np.float32).reshape(
-            len(probabilities), -1
-        )
+        super().__init__([str(x) for x in range(len(values))])
+        self._values = np.asarray(values, dtype=np.float32).flatten()
         self._probabilities = np.asarray(probabilities, dtype=np.float32).flatten()
 
-        if self._values.shape[0] != self._probabilities.shape[0]:
+        if self._values.shape != self._probabilities.shape:
             raise ValueError("Need to provide equally many probabilities and values.")
         if self._probabilities.sum() != 1.0:
             raise ValueError("Probabilities need to sum to one.")
