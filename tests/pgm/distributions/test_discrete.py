@@ -18,3 +18,15 @@ def test_multivariate():
         ["a", "b"]
     )
     assert np.array_equal(d.sample(), np.array([2, 6]))
+
+
+def test_marginalize():
+    d = distributions.Discrete(
+        [[1, 2, 3], [4, 5, 6]],
+        [[0.2, 0.2, 0.6],
+        [0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0]],
+        ["a", "b"]
+    )
+    m = d.marginalize("b")
+    assert np.array_equal(m.probabilities, np.array([1.0, 0.0, 0.0]))

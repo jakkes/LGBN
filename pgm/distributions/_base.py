@@ -38,3 +38,15 @@ class Base(abc.ABC):
                 contains multiple samples stacked in the first dimension.
         """
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def marginalize(self, variable_name: str) -> "Base":
+        """Marginalizes the distribution across the given variable.
+
+        Args:
+            variable_name (str): Variable to marginalize over.
+
+        Returns:.
+            Base: Marginalized distribution
+        """
+        raise NotImplementedError

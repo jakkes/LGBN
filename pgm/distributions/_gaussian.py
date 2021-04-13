@@ -25,7 +25,8 @@ class Gaussian(distributions.Base):
 
         mean = mean.flatten()   # .flatten() == .ravel().copy()
         n = mean.shape[0]
-        covariance = covariance.reshape((n, n)).copy()
+        covariance = covariance.reshape((n, n))
+        covariance = 0.5 * (covariance + covariance.transpose())
         if variable_names is None:
             variable_names = [str(x) for x in range(n)]
 
@@ -45,3 +46,15 @@ class Gaussian(distributions.Base):
 
     def sample(self, batches: Optional[int] = None) -> np.ndarray:
         return np.random.multivariate_normal(self._mean, self._cov, batches)
+
+    def marginalize(self, variable_name: str) -> "Gaussian":
+        i = self.variable_names.index(variable_name)
+
+        new_cov = np.delete(self._cov, i, axis=1)
+        new_cov = np.delete(new_cov, i, axis=0)
+
+        return Gaussian(
+            np.concatenate((self._mean[:i], self._mean[i+1:]), axis=0),
+            new_cov,
+            [*self.variable_names[:i], *self.variable_names[i+1:]]
+        )

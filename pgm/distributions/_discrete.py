@@ -25,8 +25,8 @@ class Discrete(distributions.Base):
             variable_names (Sequence[str]): Name of each variable output.
         """
         super().__init__(variable_names)
-        self._values = [np.asarray(x) for x in values]
-        self._probabilities = np.asarray(probabilities, dtype=np.float32)
+        self._values = np.array([np.array(x, copy=True) for x in values], dtype=object)
+        self._probabilities = np.array(probabilities, copy=True, dtype=np.float32)
         self._cumsummed = self._probabilities.ravel().cumsum(0)
 
         if self._probabilities.sum() != 1.0:
@@ -56,3 +56,11 @@ class Discrete(distributions.Base):
             np.sum(w > self._cumsummed, axis=1), self._probabilities.shape
         )
         return np.stack([value[j] for value, j in zip(self._values, i)], axis=1)
+
+    def marginalize(self, variable_name: str) -> "Discrete":
+        i = self.variable_names.index(variable_name)
+        return Discrete(
+            np.concatenate((self._values[:i], self._values[i+1:]), axis=0),
+            self._probabilities.sum(axis=i),
+            [*self.variable_names[:i], *self.variable_names[i+1:]]
+        )
