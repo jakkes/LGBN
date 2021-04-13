@@ -77,7 +77,7 @@ class Base(abc.ABC):
         marginalized non-requested variable names."""
         raise NotImplementedError
 
-    def as(self, cls: T) -> T:
+    def cast(self, cls: T) -> T:
         """Casts the object to a specific distribution.
 
         Args:
@@ -89,6 +89,6 @@ class Base(abc.ABC):
         Returns:
             T: View of the same distribution.
         """
-        if not isinstance(self, T):
+        if not isinstance(self, cls):
             raise RuntimeError(f"Failed casting from {self} to {T}")
         return self

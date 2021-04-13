@@ -36,6 +36,9 @@ class Discrete(distributions.Base):
         for values, dim in zip(self._values, self._probabilities.shape):
             if len(values) != dim:
                 raise ValueError("Probabilities were not of expected shape.")
+        for values in self._values:
+            if not np.all(np.diff(values) > 0):
+                raise ValueError("Values must be in increasing order.")
 
     @property
     def values(self) -> np.ndarray:
