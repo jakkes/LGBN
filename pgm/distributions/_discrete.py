@@ -10,24 +10,32 @@ class Discrete(distributions.Base):
 
     def __init__(
         self,
-        values: Sequence[float],
-        probabilities: Sequence[float],
+        values: Sequence[Sequence[float]],
+        probabilities: np.ndarray,
+        variable_names: Sequence[str],
     ):
         """
         Args:
-            values (Sequence[float]): Values obtainable in the distribution.
-            probabilities (Sequence[float]): Probabilities of each value.
+            values (Sequence[Sequence[float]]): Values obtainable by each variable in
+                the multivariate distribution. The first output can take values in the
+                first sequence, second variable values in the second sequence, etc.
+            probabilities (np.ndarray): Probabilities of each value combination. If
+                there are `D` variables, each taking `n_i` possible values, then this
+                array should be of shape `(n_1, n_2, ..., n_D)`.
+            variable_names (Sequence[str]): Name of each variable output.
         """
-        super().__init__([str(x) for x in range(len(values))])
-        self._values = np.asarray(values, dtype=np.float32).flatten()
-        self._probabilities = np.asarray(probabilities, dtype=np.float32).flatten()
+        super().__init__(variable_names)
+        self._values = [np.asarray(x) for x in values]
+        self._probabilities = np.asarray(probabilities, dtype=np.float32)
+        self._cumsummed = self._probabilities.ravel().cumsum(0)
 
-        if self._values.shape != self._probabilities.shape:
-            raise ValueError("Need to provide equally many probabilities and values.")
         if self._probabilities.sum() != 1.0:
             raise ValueError("Probabilities need to sum to one.")
         if np.any(self._probabilities < 0):
             raise ValueError("Probabilities cannot be negative.")
+        for values, dim in zip(self._values, self._probabilities.shape):
+            if len(values) != dim:
+                raise ValueError("Probabilities were not of expected shape.")
 
     @property
     def values(self) -> np.ndarray:
@@ -40,7 +48,11 @@ class Discrete(distributions.Base):
         return self._probabilities.copy()
 
     def sample(self, batches: Optional[int] = None) -> np.ndarray:
-        i = np.random.choice(
-            self.dim, size=batches, replace=True, p=self._probabilities
+        if batches is None:
+            return self.sample(1)[0]
+
+        w = np.random.random(size=(batches, 1))
+        i = np.unravel_index(
+            np.sum(w > self._cumsummed, axis=1), self._probabilities.shape
         )
-        return self.values[i]
+        return np.stack([value[j] for value, j in zip(self._values, i)], axis=1)
