@@ -148,18 +148,16 @@ def sample(self, batches: Optional[int] = None) -&gt; np.ndarray:
 </dd>
 <dt id="pgm.distributions.Discrete"><code class="flex name class">
 <span>class <span class="ident">Discrete</span></span>
-<span>(</span><span>values: Sequence[Tuple[float, ...]], probabilities: Sequence[float], variable_names: Sequence[str])</span>
+<span>(</span><span>values: Sequence[float], probabilities: Sequence[float])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Discrete multivariate distribution.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>values</code></strong> :&ensp;<code>Sequence[Tuple[float, &hellip;]]</code></dt>
+<dt><strong><code>values</code></strong> :&ensp;<code>Sequence[float]</code></dt>
 <dd>Values obtainable in the distribution.</dd>
 <dt><strong><code>probabilities</code></strong> :&ensp;<code>Sequence[float]</code></dt>
 <dd>Probabilities of each value.</dd>
-<dt><strong><code>variable_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
-<dd>Names of the variables.</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
