@@ -1,7 +1,10 @@
 import abc
-from typing import Sequence, List, Optional
+from typing import Sequence, List, Optional, TypeVar
 
 import numpy as np
+
+
+T = TypeVar("T")
 
 
 class Base(abc.ABC):
@@ -73,3 +76,19 @@ class Base(abc.ABC):
         variable names. This method is called from `reorder`, which has already
         marginalized non-requested variable names."""
         raise NotImplementedError
+
+    def as(self, cls: T) -> T:
+        """Casts the object to a specific distribution.
+
+        Args:
+            cls (T): Class to cast to.
+
+        Raises:
+            RuntimeError: If the cast failed.
+
+        Returns:
+            T: View of the same distribution.
+        """
+        if not isinstance(self, T):
+            raise RuntimeError(f"Failed casting from {self} to {T}")
+        return self
