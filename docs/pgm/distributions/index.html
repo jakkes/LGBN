@@ -108,6 +108,47 @@ def variable_names(self) -&gt; List[str]:
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="pgm.distributions.Base.cast"><code class="name flex">
+<span>def <span class="ident">cast</span></span>(<span>self, cls: ~T) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Casts the object to a specific distribution.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>cls</code></strong> :&ensp;<code>T</code></dt>
+<dd>Class to cast to.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>RuntimeError</code></dt>
+<dd>If the cast failed.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>View of the same distribution.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cast(self, cls: T) -&gt; T:
+    &#34;&#34;&#34;Casts the object to a specific distribution.
+
+    Args:
+        cls (T): Class to cast to.
+
+    Raises:
+        RuntimeError: If the cast failed.
+
+    Returns:
+        T: View of the same distribution.
+    &#34;&#34;&#34;
+    if not isinstance(self, cls):
+        raise RuntimeError(f&#34;Failed casting from {self} to {T}&#34;)
+    return self</code></pre>
+</details>
+</dd>
 <dt id="pgm.distributions.Base.marginalize"><code class="name flex">
 <span>def <span class="ident">marginalize</span></span>(<span>self, variable_name: str) ‑> ai.distributions.Base</span>
 </code></dt>
@@ -458,7 +499,8 @@ contains multiple samples stacked in the first dimension.</dd>
 <ul>
 <li>
 <h4><code><a title="pgm.distributions.Base" href="#pgm.distributions.Base">Base</a></code></h4>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="pgm.distributions.Base.cast" href="#pgm.distributions.Base.cast">cast</a></code></li>
 <li><code><a title="pgm.distributions.Base.dim" href="#pgm.distributions.Base.dim">dim</a></code></li>
 <li><code><a title="pgm.distributions.Base.marginalize" href="#pgm.distributions.Base.marginalize">marginalize</a></code></li>
 <li><code><a title="pgm.distributions.Base.reorder" href="#pgm.distributions.Base.reorder">reorder</a></code></li>
