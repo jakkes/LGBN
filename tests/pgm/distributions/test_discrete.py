@@ -30,3 +30,16 @@ def test_marginalize():
     )
     m = d.marginalize("b")
     assert np.array_equal(m.probabilities, np.array([1.0, 0.0, 0.0]))
+
+
+def test_reorder():
+    d = distributions.Discrete(
+        [[1, 2, 3], [4, 5, 6]],
+        [[0.2, 0.2, 0.6],
+        [0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0]],
+        ["a", "b"]
+    )
+    d = d.reorder(["b", "a"])
+    for _ in range(10):
+        assert d.sample()[1] == 1

@@ -58,3 +58,16 @@ class Gaussian(distributions.Base):
             new_cov,
             [*self.variable_names[:i], *self.variable_names[i+1:]]
         )
+
+    def _reorder(self, variable_names: Sequence[str]) -> "Gaussian":
+        mean = self._mean
+        cov = self._cov
+        current_order = list(self.variable_names)
+
+        for i, name in enumerate(variable_names):
+            j = current_order.index(name)
+            mean[i], mean[j] = mean[j].copy(), mean[i].copy()
+            cov = np.swapaxes(cov, j, i)
+            current_order[i], current_order[j] = current_order[j], current_order[i]
+
+        return Gaussian(mean, cov, current_order)

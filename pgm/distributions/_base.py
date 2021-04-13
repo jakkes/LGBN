@@ -50,3 +50,26 @@ class Base(abc.ABC):
             Base: Marginalized distribution
         """
         raise NotImplementedError
+
+    def reorder(self, variable_names: Sequence[str]) -> "Base":
+        """Reorders the output variables of the distribution.
+
+        Args:
+            variable_names (Sequence[str]): Requested order of variables. Variables of
+                the distribution that are not in the given sequence, are marginalized.
+        
+        Returns:
+            Base: New distribution with the specified output order.
+        """
+        new = self
+        for name in self._variable_names:
+            if name not in variable_names:
+                new = new.marginalize(name)
+        return new._reorder(variable_names)
+
+    @abc.abstractmethod
+    def _reorder(self, variable_names: Sequence[str]) -> "Base":
+        """Reorders the output variables according to the given sequence of
+        variable names. This method is called from `reorder`, which has already
+        marginalized non-requested variable names."""
+        raise NotImplementedError

@@ -64,3 +64,16 @@ class Discrete(distributions.Base):
             self._probabilities.sum(axis=i),
             [*self.variable_names[:i], *self.variable_names[i+1:]]
         )
+
+    def _reorder(self, variable_names: Sequence[str]) -> "Discrete":
+        values = self._values
+        probs = self._probabilities
+        current_order = list(self.variable_names)
+
+        for i, name in enumerate(variable_names):
+            j = current_order.index(name)
+            values[i], values[j] = values[j].copy(), values[i].copy()
+            probs = np.swapaxes(probs, j, i)
+            current_order[i], current_order[j] = current_order[j], current_order[i]
+
+        return Discrete(values, probs, current_order)
