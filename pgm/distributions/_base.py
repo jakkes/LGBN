@@ -8,33 +8,31 @@ T = TypeVar("T")
 
 
 class Base(abc.ABC):
-    """Base class for multivariate distributions."""
+    """Base class for distributions."""
 
-    def __init__(self, variable_names: Sequence[str]):
+    def __init__(self, dim: int) -> None:
         """
         Args:
-            variable_names (Sequence[str]): Sequence of variable name identifiers.
-                Output variables are ordered, and thus identifiable, by these names.
+            dim (int): Dimension of the distribution.
         """
-        self._variable_names = list(variable_names)
+        super().__init__()
+
+        if dim < 0:
+            raise ValueError("Dimension must be a positive integer.")
+        self._dim = dim
 
     @property
     def dim(self) -> int:
         """Dimension in which the distribution generates samples."""
-        return len(self._variable_names)
-
-    @property
-    def variable_names(self) -> List[str]:
-        """Variable names of outputs."""
-        return self._variable_names
+        return self._dim
 
     @abc.abstractmethod
     def sample(self, batches: Optional[int] = None) -> np.ndarray:
         """Samples from the distribution.
 
         Args:
-            batches (Optional[int], optional): If not None, multiple samples are generated and
-                stacked. Defaults to None.
+            batches (Optional[int], optional): If not None, multiple samples are
+                generated and stacked. Defaults to None.
 
         Returns:
             np.ndarray: Sampled values. If `batches` is not None, then the output
@@ -43,38 +41,15 @@ class Base(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def marginalize(self, variable_name: str) -> "Base":
-        """Marginalizes the distribution across the given variable.
+    def marginalize(self, axis: int) -> "Base":
+        """Marginalizes the distribution across the given axis.
 
         Args:
-            variable_name (str): Variable to marginalize over.
+            axis (int): Axis to marginalize over.
 
         Returns:.
-            Base: Marginalized distribution
+            Base: Marginalized distribution.
         """
-        raise NotImplementedError
-
-    def reorder(self, variable_names: Sequence[str]) -> "Base":
-        """Reorders the output variables of the distribution.
-
-        Args:
-            variable_names (Sequence[str]): Requested order of variables. Variables of
-                the distribution that are not in the given sequence, are marginalized.
-        
-        Returns:
-            Base: New distribution with the specified output order.
-        """
-        new = self
-        for name in self._variable_names:
-            if name not in variable_names:
-                new = new.marginalize(name)
-        return new._reorder(variable_names)
-
-    @abc.abstractmethod
-    def _reorder(self, variable_names: Sequence[str]) -> "Base":
-        """Reorders the output variables according to the given sequence of
-        variable names. This method is called from `reorder`, which has already
-        marginalized non-requested variable names."""
         raise NotImplementedError
 
     def cast(self, cls: T) -> T:

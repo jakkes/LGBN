@@ -1,4 +1,4 @@
-from typing import Sequence, Optional, Tuple
+from typing import Sequence, Optional
 
 import numpy as np
 
@@ -12,7 +12,6 @@ class Discrete(distributions.Base):
         self,
         values: Sequence[Sequence[float]],
         probabilities: np.ndarray,
-        variable_names: Sequence[str],
     ):
         """
         Args:
@@ -22,14 +21,13 @@ class Discrete(distributions.Base):
             probabilities (np.ndarray): Probabilities of each value combination. If
                 there are `D` variables, each taking `n_i` possible values, then this
                 array should be of shape `(n_1, n_2, ..., n_D)`.
-            variable_names (Sequence[str]): Name of each variable output.
         """
-        super().__init__(variable_names)
+        super().__init__(len(values))
         self._values = np.array([np.array(x, copy=True) for x in values], dtype=object)
-        self._probabilities = np.array(probabilities, copy=True, dtype=np.float32)
+        self._probabilities = np.array(probabilities, copy=True)
         self._cumsummed = self._probabilities.ravel().cumsum(0)
 
-        if self._probabilities.sum() != 1.0:
+        if self._cumsummed[-1] != 1.0:
             raise ValueError("Probabilities need to sum to one.")
         if np.any(self._probabilities < 0):
             raise ValueError("Probabilities cannot be negative.")
@@ -60,23 +58,8 @@ class Discrete(distributions.Base):
         )
         return np.stack([value[j] for value, j in zip(self._values, i)], axis=1)
 
-    def marginalize(self, variable_name: str) -> "Discrete":
-        i = self.variable_names.index(variable_name)
+    def marginalize(self, axis: int) -> "Discrete":
         return Discrete(
-            np.concatenate((self._values[:i], self._values[i+1:]), axis=0),
-            self._probabilities.sum(axis=i),
-            [*self.variable_names[:i], *self.variable_names[i+1:]]
+            np.concatenate((self._values[:axis], self._values[axis+1:]), axis=0),
+            self._probabilities.sum(axis=axis)
         )
-
-    def _reorder(self, variable_names: Sequence[str]) -> "Discrete":
-        values = self._values
-        probs = self._probabilities
-        current_order = list(self.variable_names)
-
-        for i, name in enumerate(variable_names):
-            j = current_order.index(name)
-            values[i], values[j] = values[j].copy(), values[i].copy()
-            probs = np.swapaxes(probs, j, i)
-            current_order[i], current_order[j] = current_order[j], current_order[i]
-
-        return Discrete(values, probs, current_order)

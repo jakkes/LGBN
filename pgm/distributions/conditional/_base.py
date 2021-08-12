@@ -8,23 +8,24 @@ import pgm.distributions as distributions
 class Base(abc.ABC):
     """Base conditional distribution."""
 
-    def __init__(self, variable_names: Sequence[str]):
+    def __init__(self, dim: int, conditioned_dim: int):
         """
         Args:
-            variable_names (Sequence[str]): Sequence of variable name identifiers.
-                Output variables are ordered, and thus identifiable, by these names.
+            dim (int): Dimension of the distribution.
+            conditioned_dim (int): Dimension of the conditional distribution.
         """
-        self._variable_names = list(variable_names)
+        super().__init__()
+        self._dim = dim
+        self._conditioned_dim = conditioned_dim
 
     @property
     def dim(self) -> int:
         """Dimension in which the distribution generates samples."""
-        return len(self._variable_names)
+        return self._dim
 
     @property
-    def variable_names(self) -> List[str]:
-        """Variable names of outputs."""
-        return self._variable_names
+    def conditioned_dim(self) -> int:
+        return self._conditioned_dim
 
     @abc.abstractmethod
     def marginalize(self, distribution: distributions.Base) -> distributions.Base:

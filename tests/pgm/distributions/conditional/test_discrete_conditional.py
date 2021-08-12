@@ -11,9 +11,7 @@ def test_by_evidence():
             np.array([1, 0, 0]),
             np.array([0, 1, 0]),
             np.array([0, 0, 1])
-        ], dtype=object),
-        ["a"],
-        ["b"]
+        ], dtype=object)
     )
     d = c.by_evidence(np.array([5]))
     assert np.array_equal(d.sample(), np.array([2]))
@@ -27,14 +25,11 @@ def test_marginalization():
             np.array([1, 0, 0]),
             np.array([0, 1, 0]),
             np.array([0, 0, 1])
-        ]),
-        ["a"],
-        ["b"]
+        ])
     )
     d = distributions.Discrete(
         [[4, 5, 6]],
-        np.array([0, 0, 1]),
-        ["b"]
+        np.array([0, 0, 1])
     )
     e = c.marginalize(d)
     assert np.array_equal(e.sample(), np.array([3]))
