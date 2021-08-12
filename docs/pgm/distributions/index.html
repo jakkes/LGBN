@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>pgm.distributions API documentation</title>
 <meta name="description" content="Definitions of distributions." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -58,15 +58,14 @@ __all__ = [&#34;Base&#34;, &#34;conditional&#34;, &#34;Gaussian&#34;, &#34;Discr
 <dl>
 <dt id="pgm.distributions.Base"><code class="flex name class">
 <span>class <span class="ident">Base</span></span>
-<span>(</span><span>variable_names: Sequence[str])</span>
+<span>(</span><span>dim: int)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Base class for multivariate distributions.</p>
+<div class="desc"><p>Base class for distributions.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>variable_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
-<dd>Sequence of variable name identifiers.
-Output variables are ordered, and thus identifiable, by these names.</dd>
+<dt><strong><code>dim</code></strong> :&ensp;<code>int</code></dt>
+<dd>Dimension of the distribution.</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -89,20 +88,7 @@ Output variables are ordered, and thus identifiable, by these names.</dd>
 <pre><code class="python">@property
 def dim(self) -&gt; int:
     &#34;&#34;&#34;Dimension in which the distribution generates samples.&#34;&#34;&#34;
-    return len(self._variable_names)</code></pre>
-</details>
-</dd>
-<dt id="pgm.distributions.Base.variable_names"><code class="name">var <span class="ident">variable_names</span> : List[str]</code></dt>
-<dd>
-<div class="desc"><p>Variable names of outputs.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def variable_names(self) -&gt; List[str]:
-    &#34;&#34;&#34;Variable names of outputs.&#34;&#34;&#34;
-    return self._variable_names</code></pre>
+    return self._dim</code></pre>
 </details>
 </dd>
 </dl>
@@ -150,81 +136,44 @@ def variable_names(self) -&gt; List[str]:
 </details>
 </dd>
 <dt id="pgm.distributions.Base.marginalize"><code class="name flex">
-<span>def <span class="ident">marginalize</span></span>(<span>self, variable_name: str) ‑> ai.distributions.Base</span>
+<span>def <span class="ident">marginalize</span></span>(<span>self, axis: int) ‑> ai.distributions.Base</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Marginalizes the distribution across the given variable.</p>
+<div class="desc"><p>Marginalizes the distribution across the given axis.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>variable_name</code></strong> :&ensp;<code>str</code></dt>
-<dd>Variable to marginalize over.</dd>
+<dt><strong><code>axis</code></strong> :&ensp;<code>int</code></dt>
+<dd>Axis to marginalize over.</dd>
 </dl>
 <p>Returns:.
-Base: Marginalized distribution</p></div>
+Base: Marginalized distribution.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abc.abstractmethod
-def marginalize(self, variable_name: str) -&gt; &#34;Base&#34;:
-    &#34;&#34;&#34;Marginalizes the distribution across the given variable.
+def marginalize(self, axis: int) -&gt; &#34;Base&#34;:
+    &#34;&#34;&#34;Marginalizes the distribution across the given axis.
 
     Args:
-        variable_name (str): Variable to marginalize over.
+        axis (int): Axis to marginalize over.
 
     Returns:.
-        Base: Marginalized distribution
+        Base: Marginalized distribution.
     &#34;&#34;&#34;
     raise NotImplementedError</code></pre>
 </details>
 </dd>
-<dt id="pgm.distributions.Base.reorder"><code class="name flex">
-<span>def <span class="ident">reorder</span></span>(<span>self, variable_names: Sequence[str]) ‑> ai.distributions.Base</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Reorders the output variables of the distribution.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>variable_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
-<dd>Requested order of variables. Variables of
-the distribution that are not in the given sequence, are marginalized.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code><a title="pgm.distributions.Base" href="#pgm.distributions.Base">Base</a></code></dt>
-<dd>New distribution with the specified output order.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def reorder(self, variable_names: Sequence[str]) -&gt; &#34;Base&#34;:
-    &#34;&#34;&#34;Reorders the output variables of the distribution.
-
-    Args:
-        variable_names (Sequence[str]): Requested order of variables. Variables of
-            the distribution that are not in the given sequence, are marginalized.
-    
-    Returns:
-        Base: New distribution with the specified output order.
-    &#34;&#34;&#34;
-    new = self
-    for name in self._variable_names:
-        if name not in variable_names:
-            new = new.marginalize(name)
-    return new._reorder(variable_names)</code></pre>
-</details>
-</dd>
 <dt id="pgm.distributions.Base.sample"><code class="name flex">
-<span>def <span class="ident">sample</span></span>(<span>self, batches: Union[int, NoneType] = None) ‑> numpy.ndarray</span>
+<span>def <span class="ident">sample</span></span>(<span>self, batches: Optional[int] = None) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Samples from the distribution.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>batches</code></strong> :&ensp;<code>Optional[int]</code>, optional</dt>
-<dd>If not None, multiple samples are generated and
-stacked. Defaults to None.</dd>
+<dd>If not None, multiple samples are
+generated and stacked. Defaults to None.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -241,8 +190,8 @@ def sample(self, batches: Optional[int] = None) -&gt; np.ndarray:
     &#34;&#34;&#34;Samples from the distribution.
 
     Args:
-        batches (Optional[int], optional): If not None, multiple samples are generated and
-            stacked. Defaults to None.
+        batches (Optional[int], optional): If not None, multiple samples are
+            generated and stacked. Defaults to None.
 
     Returns:
         np.ndarray: Sampled values. If `batches` is not None, then the output
@@ -255,7 +204,7 @@ def sample(self, batches: Optional[int] = None) -&gt; np.ndarray:
 </dd>
 <dt id="pgm.distributions.Discrete"><code class="flex name class">
 <span>class <span class="ident">Discrete</span></span>
-<span>(</span><span>values: Sequence[Sequence[float]], probabilities: numpy.ndarray, variable_names: Sequence[str])</span>
+<span>(</span><span>values: Sequence[Sequence[float]], probabilities: numpy.ndarray)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Discrete multivariate distribution.</p>
@@ -269,8 +218,6 @@ first sequence, second variable values in the second sequence, etc.</dd>
 <dd>Probabilities of each value combination. If
 there are <code>D</code> variables, each taking <code>n_i</code> possible values, then this
 array should be of shape <code>(n_1, n_2, &hellip;, n_D)</code>.</dd>
-<dt><strong><code>variable_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
-<dd>Name of each variable output.</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -309,40 +256,38 @@ def values(self) -&gt; np.ndarray:
 <h3>Methods</h3>
 <dl>
 <dt id="pgm.distributions.Discrete.marginalize"><code class="name flex">
-<span>def <span class="ident">marginalize</span></span>(<span>self, variable_name: str) ‑> ai.distributions.Discrete</span>
+<span>def <span class="ident">marginalize</span></span>(<span>self, axis: int) ‑> ai.distributions.Discrete</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Marginalizes the distribution across the given variable.</p>
+<div class="desc"><p>Marginalizes the distribution across the given axis.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>variable_name</code></strong> :&ensp;<code>str</code></dt>
-<dd>Variable to marginalize over.</dd>
+<dt><strong><code>axis</code></strong> :&ensp;<code>int</code></dt>
+<dd>Axis to marginalize over.</dd>
 </dl>
 <p>Returns:.
-Base: Marginalized distribution</p></div>
+Base: Marginalized distribution.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def marginalize(self, variable_name: str) -&gt; &#34;Discrete&#34;:
-    i = self.variable_names.index(variable_name)
+<pre><code class="python">def marginalize(self, axis: int) -&gt; &#34;Discrete&#34;:
     return Discrete(
-        np.concatenate((self._values[:i], self._values[i+1:]), axis=0),
-        self._probabilities.sum(axis=i),
-        [*self.variable_names[:i], *self.variable_names[i+1:]]
+        np.concatenate((self._values[:axis], self._values[axis+1:]), axis=0),
+        self._probabilities.sum(axis=axis)
     )</code></pre>
 </details>
 </dd>
 <dt id="pgm.distributions.Discrete.sample"><code class="name flex">
-<span>def <span class="ident">sample</span></span>(<span>self, batches: Union[int, NoneType] = None) ‑> numpy.ndarray</span>
+<span>def <span class="ident">sample</span></span>(<span>self, batches: Optional[int] = None) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Samples from the distribution.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>batches</code></strong> :&ensp;<code>Optional[int]</code>, optional</dt>
-<dd>If not None, multiple samples are generated and
-stacked. Defaults to None.</dd>
+<dd>If not None, multiple samples are
+generated and stacked. Defaults to None.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -369,7 +314,7 @@ contains multiple samples stacked in the first dimension.</dd>
 </dd>
 <dt id="pgm.distributions.Gaussian"><code class="flex name class">
 <span>class <span class="ident">Gaussian</span></span>
-<span>(</span><span>mean: numpy.ndarray, covariance: numpy.ndarray, variable_names: Union[Sequence[str], NoneType] = None)</span>
+<span>(</span><span>mean: numpy.ndarray, covariance: numpy.ndarray)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Gaussian distribution, defined by a mean value vector and a covariance matrix.</p>
@@ -379,10 +324,6 @@ contains multiple samples stacked in the first dimension.</dd>
 <dd>Mean vector.</dd>
 <dt><strong><code>covariance</code></strong> :&ensp;<code>np.ndarray</code></dt>
 <dd>Covariance matrix.</dd>
-<dt><strong><code>variable_names</code></strong> :&ensp;<code>Optional[Sequence[str]]</code>, optional</dt>
-<dd>Optional variable names.
-Defaults to None. If None, names are automatically generated for each
-variable as "0", "1", "2", &hellip;</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -421,44 +362,41 @@ def mean(self) -&gt; np.ndarray:
 <h3>Methods</h3>
 <dl>
 <dt id="pgm.distributions.Gaussian.marginalize"><code class="name flex">
-<span>def <span class="ident">marginalize</span></span>(<span>self, variable_name: str) ‑> ai.distributions.Gaussian</span>
+<span>def <span class="ident">marginalize</span></span>(<span>self, axis: int) ‑> ai.distributions.Gaussian</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Marginalizes the distribution across the given variable.</p>
+<div class="desc"><p>Marginalizes the distribution across the given axis.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>variable_name</code></strong> :&ensp;<code>str</code></dt>
-<dd>Variable to marginalize over.</dd>
+<dt><strong><code>axis</code></strong> :&ensp;<code>int</code></dt>
+<dd>Axis to marginalize over.</dd>
 </dl>
 <p>Returns:.
-Base: Marginalized distribution</p></div>
+Base: Marginalized distribution.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def marginalize(self, variable_name: str) -&gt; &#34;Gaussian&#34;:
-    i = self.variable_names.index(variable_name)
-
-    new_cov = np.delete(self._cov, i, axis=1)
-    new_cov = np.delete(new_cov, i, axis=0)
+<pre><code class="python">def marginalize(self, axis: int) -&gt; &#34;Gaussian&#34;:
+    new_cov = np.delete(self._cov, axis, axis=1)
+    new_cov = np.delete(new_cov, axis, axis=0)
 
     return Gaussian(
-        np.concatenate((self._mean[:i], self._mean[i+1:]), axis=0),
+        np.concatenate((self._mean[:axis], self._mean[axis+1:]), axis=0),
         new_cov,
-        [*self.variable_names[:i], *self.variable_names[i+1:]]
     )</code></pre>
 </details>
 </dd>
 <dt id="pgm.distributions.Gaussian.sample"><code class="name flex">
-<span>def <span class="ident">sample</span></span>(<span>self, batches: Union[int, NoneType] = None) ‑> numpy.ndarray</span>
+<span>def <span class="ident">sample</span></span>(<span>self, batches: Optional[int] = None) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Samples from the distribution.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>batches</code></strong> :&ensp;<code>Optional[int]</code>, optional</dt>
-<dd>If not None, multiple samples are generated and
-stacked. Defaults to None.</dd>
+<dd>If not None, multiple samples are
+generated and stacked. Defaults to None.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -499,13 +437,11 @@ contains multiple samples stacked in the first dimension.</dd>
 <ul>
 <li>
 <h4><code><a title="pgm.distributions.Base" href="#pgm.distributions.Base">Base</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="pgm.distributions.Base.cast" href="#pgm.distributions.Base.cast">cast</a></code></li>
 <li><code><a title="pgm.distributions.Base.dim" href="#pgm.distributions.Base.dim">dim</a></code></li>
 <li><code><a title="pgm.distributions.Base.marginalize" href="#pgm.distributions.Base.marginalize">marginalize</a></code></li>
-<li><code><a title="pgm.distributions.Base.reorder" href="#pgm.distributions.Base.reorder">reorder</a></code></li>
 <li><code><a title="pgm.distributions.Base.sample" href="#pgm.distributions.Base.sample">sample</a></code></li>
-<li><code><a title="pgm.distributions.Base.variable_names" href="#pgm.distributions.Base.variable_names">variable_names</a></code></li>
 </ul>
 </li>
 <li>
@@ -532,7 +468,7 @@ contains multiple samples stacked in the first dimension.</dd>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>

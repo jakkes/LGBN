@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>pgm.distributions.conditional API documentation</title>
 <meta name="description" content="Conditional distributions." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -48,15 +48,16 @@ __all__ = [&#34;Base&#34;, &#34;Discrete&#34;]</code></pre>
 <dl>
 <dt id="pgm.distributions.conditional.Base"><code class="flex name class">
 <span>class <span class="ident">Base</span></span>
-<span>(</span><span>variable_names: Sequence[str])</span>
+<span>(</span><span>dim: int, conditioned_dim: int)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base conditional distribution.</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>variable_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
-<dd>Sequence of variable name identifiers.
-Output variables are ordered, and thus identifiable, by these names.</dd>
+<dt><strong><code>dim</code></strong> :&ensp;<code>int</code></dt>
+<dd>Dimension of the distribution.</dd>
+<dt><strong><code>conditioned_dim</code></strong> :&ensp;<code>int</code></dt>
+<dd>Dimension of the conditional distribution.</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -68,6 +69,18 @@ Output variables are ordered, and thus identifiable, by these names.</dd>
 </ul>
 <h3>Instance variables</h3>
 <dl>
+<dt id="pgm.distributions.conditional.Base.conditioned_dim"><code class="name">var <span class="ident">conditioned_dim</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def conditioned_dim(self) -&gt; int:
+    return self._conditioned_dim</code></pre>
+</details>
+</dd>
 <dt id="pgm.distributions.conditional.Base.dim"><code class="name">var <span class="ident">dim</span> : int</code></dt>
 <dd>
 <div class="desc"><p>Dimension in which the distribution generates samples.</p></div>
@@ -78,20 +91,7 @@ Output variables are ordered, and thus identifiable, by these names.</dd>
 <pre><code class="python">@property
 def dim(self) -&gt; int:
     &#34;&#34;&#34;Dimension in which the distribution generates samples.&#34;&#34;&#34;
-    return len(self._variable_names)</code></pre>
-</details>
-</dd>
-<dt id="pgm.distributions.conditional.Base.variable_names"><code class="name">var <span class="ident">variable_names</span> : List[str]</code></dt>
-<dd>
-<div class="desc"><p>Variable names of outputs.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def variable_names(self) -&gt; List[str]:
-    &#34;&#34;&#34;Variable names of outputs.&#34;&#34;&#34;
-    return self._variable_names</code></pre>
+    return self._dim</code></pre>
 </details>
 </dd>
 </dl>
@@ -165,7 +165,7 @@ def marginalize(self, distribution: distributions.Base) -&gt; distributions.Base
 </dd>
 <dt id="pgm.distributions.conditional.Discrete"><code class="flex name class">
 <span>class <span class="ident">Discrete</span></span>
-<span>(</span><span>values: Sequence[Sequence[float]], conditioned_values: Sequence[Sequence[float]], probabilities: numpy.ndarray, variable_names: Sequence[str], conditioned_names: Sequence[str])</span>
+<span>(</span><span>values: Sequence[Sequence[float]], conditioned_values: Sequence[Sequence[float]], probabilities: numpy.ndarray)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Multivariate distribution of discrete variables, conditionally dependent on some
@@ -188,10 +188,6 @@ there are <code>N</code> output variables, each taking <code>l_i</code> values, 
 conditioned variables, each taking <code>k_i</code> values, then this is a tensor
 of shape <code>(k_1, k_2, &hellip;, k_M)</code> where each element itself is a tensor
 of shape <code>(l_1, l_2, &hellip;, l_N)</code> summing to one.</dd>
-<dt><strong><code>variable_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
-<dd>Names of the output variables.</dd>
-<dt><strong><code>conditioned_names</code></strong> :&ensp;<code>Sequence[str]</code></dt>
-<dd>Names of the conditioned variables.</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -224,7 +220,7 @@ of shape <code>(l_1, l_2, &hellip;, l_N)</code> summing to one.</dd>
         np.where(self._conditioned_values[i] == x)[0][0] for i, x in enumerate(evidence)
     )
     return distributions.Discrete(
-        self._values, self._probabilities[i], self.variable_names
+        self._values, self._probabilities[i]
     )</code></pre>
 </details>
 </dd>
@@ -250,9 +246,7 @@ of shape <code>(l_1, l_2, &hellip;, l_N)</code> summing to one.</dd>
 <pre><code class="python">def marginalize(
     self, distribution: &#34;distributions.Discrete&#34;
 ) -&gt; &#34;distributions.Discrete&#34;:
-    distribution = distribution.reorder(self._conditioned_names).cast(
-        distributions.Discrete
-    )
+
     if not np.array_equal(distribution.values, self._conditioned_values):
         raise ValueError(
             &#34;Values of the given distribution do not align with the conditioned &#34;
@@ -264,7 +258,7 @@ of shape <code>(l_1, l_2, &hellip;, l_N)</code> summing to one.</dd>
         distribution.probabilities.ravel(), np.ndindex(conditioned_shape)
     ):
         new_p += np.asarray(p * self._probabilities[di], dtype=np.float32)
-    return distributions.Discrete(self._values, new_p, self.variable_names)</code></pre>
+    return distributions.Discrete(self._values, new_p)</code></pre>
 </details>
 </dd>
 </dl>
@@ -289,9 +283,9 @@ of shape <code>(l_1, l_2, &hellip;, l_N)</code> summing to one.</dd>
 <h4><code><a title="pgm.distributions.conditional.Base" href="#pgm.distributions.conditional.Base">Base</a></code></h4>
 <ul class="">
 <li><code><a title="pgm.distributions.conditional.Base.by_evidence" href="#pgm.distributions.conditional.Base.by_evidence">by_evidence</a></code></li>
+<li><code><a title="pgm.distributions.conditional.Base.conditioned_dim" href="#pgm.distributions.conditional.Base.conditioned_dim">conditioned_dim</a></code></li>
 <li><code><a title="pgm.distributions.conditional.Base.dim" href="#pgm.distributions.conditional.Base.dim">dim</a></code></li>
 <li><code><a title="pgm.distributions.conditional.Base.marginalize" href="#pgm.distributions.conditional.Base.marginalize">marginalize</a></code></li>
-<li><code><a title="pgm.distributions.conditional.Base.variable_names" href="#pgm.distributions.conditional.Base.variable_names">variable_names</a></code></li>
 </ul>
 </li>
 <li>
@@ -307,7 +301,7 @@ of shape <code>(l_1, l_2, &hellip;, l_N)</code> summing to one.</dd>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
