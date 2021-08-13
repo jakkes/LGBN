@@ -20,23 +20,23 @@ def test_marginalization():
     assert m.covariance[0, 0] == 1.0
 
 
-def test_likelihood():
+def test_pdf():
     d = distributions.Gaussian(
         np.zeros(2), np.eye(2)
     )
-    assert np.isclose(d.likelihood(np.zeros(2)), 0.15915494)
+    assert np.isclose(d.pdf(np.zeros(2)), 0.15915494)
     assert np.allclose(
-        d.likelihood(np.zeros((1, 3, 2, 1, 2))),
+        d.pdf(np.zeros((1, 3, 2, 1, 2))),
         0.15915494 * np.ones((1, 3, 2, 1))
     )
 
 
-def test_cdf_probability():
+def test_cdf():
     d = distributions.Gaussian(
         np.zeros(2), np.eye(2)
     )
-    assert np.isclose(d.cdf_probability(np.zeros(2)), 0.25)
+    assert np.isclose(d.cdf(np.zeros(2)), 0.25)
     assert np.allclose(
-        d.cdf_probability(np.zeros((1, 3, 2, 1, 2))),
+        d.cdf(np.zeros((1, 3, 2, 1, 2))),
         0.25 * np.ones((1, 3, 2, 1))
     )

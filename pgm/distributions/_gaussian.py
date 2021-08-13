@@ -40,13 +40,13 @@ class Gaussian(distributions.Continuous):
         """Covariance matrix."""
         return self._cov.copy()
 
-    def likelihood(self, evidence: np.ndarray) -> Union[np.ndarray, float]:
+    def pdf(self, evidence: np.ndarray) -> Union[np.ndarray, float]:
         re = self._sp.pdf(evidence)
         for axis in np.where(np.array(evidence.shape) == 1)[0]:
             re = np.expand_dims(re, axis)
         return re
 
-    def cdf_probability(self, target: np.ndarray) -> Union[np.ndarray, float]:
+    def cdf(self, target: np.ndarray) -> Union[np.ndarray, float]:
         re = self._sp.cdf(target)
         for axis in np.where(np.array(target.shape) == 1)[0]:
             re = np.expand_dims(re, axis)

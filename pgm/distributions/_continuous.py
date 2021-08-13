@@ -10,7 +10,7 @@ class Continuous(distributions.Base):
     """Base class for continuous distributions."""
 
     @abc.abstractmethod
-    def likelihood(self, evidence: np.ndarray) -> Union[np.ndarray, float]:
+    def pdf(self, evidence: np.ndarray) -> Union[np.ndarray, float]:
         """Computes likelihood of the observed data.
 
         Args:
@@ -27,7 +27,7 @@ class Continuous(distributions.Base):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def cdf_probability(self, target: np.ndarray) -> Union[np.ndarray, float]:
+    def cdf(self, target: np.ndarray) -> Union[np.ndarray, float]:
         """Computes the probability of observing values smaller than `target`, i.e.
         `P(X < t)`, where `t` denotes `target`.
 
