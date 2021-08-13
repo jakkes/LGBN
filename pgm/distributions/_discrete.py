@@ -1,4 +1,4 @@
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Union
 
 import numpy as np
 
@@ -48,6 +48,34 @@ class Discrete(distributions.Base):
         """Probabilities of taking each value."""
         return self._probabilities.copy()
 
+    def probability(self, evidence: np.ndarray) -> Union[np.ndarray, float]:
+        """Computes the probability of the evidence.
+
+        Args:
+            evidence (np.ndarray): Array of observed values of shape
+                `(d1, d2, ..., dn, N)`, with `N` denoting the distribution dimension.
+                All operations are performed on the last axis only, allowing for batch
+                processing.
+
+                All values are rounded _up_ to their closest value present in the
+                distribution. Values greater than the greatest value present in the
+                distribution are, instead, rounded down.
+
+        Returns:
+            Union[np.ndarray, float]: Probability of observed values. Either an array of
+                shape `(d1, d2, ..., dn)` or, if the input is of shape `(N, )`, a
+                scalar.
+        """
+        indices = tuple(
+            np.minimum(np.sum(
+                np.expand_dims(self._values[i], 0)
+                < np.expand_dims(evidence[..., i], -1),
+                axis=-1,
+            ), len(self._values[i]) - 1)
+            for i in range(self._dim)
+        )
+        return self._probabilities[indices]
+
     def sample(self, batches: Optional[int] = None) -> np.ndarray:
         if batches is None:
             return self.sample(1)[0]
@@ -60,6 +88,6 @@ class Discrete(distributions.Base):
 
     def marginalize(self, axis: int) -> "Discrete":
         return Discrete(
-            np.concatenate((self._values[:axis], self._values[axis+1:]), axis=0),
-            self._probabilities.sum(axis=axis)
+            np.concatenate((self._values[:axis], self._values[axis + 1 :]), axis=0),
+            self._probabilities.sum(axis=axis),
         )
