@@ -225,8 +225,8 @@ def sample(self, batches: Optional[int] = None) -&gt; np.ndarray:
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="pgm.distributions.Continuous.cdf_probability"><code class="name flex">
-<span>def <span class="ident">cdf_probability</span></span>(<span>self, target: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
+<dt id="pgm.distributions.Continuous.cdf"><code class="name flex">
+<span>def <span class="ident">cdf</span></span>(<span>self, target: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Computes the probability of observing values smaller than <code>target</code>, i.e.
@@ -250,7 +250,7 @@ scalar.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abc.abstractmethod
-def cdf_probability(self, target: np.ndarray) -&gt; Union[np.ndarray, float]:
+def cdf(self, target: np.ndarray) -&gt; Union[np.ndarray, float]:
     &#34;&#34;&#34;Computes the probability of observing values smaller than `target`, i.e.
     `P(X &lt; t)`, where `t` denotes `target`.
 
@@ -267,8 +267,8 @@ def cdf_probability(self, target: np.ndarray) -&gt; Union[np.ndarray, float]:
     raise NotImplementedError</code></pre>
 </details>
 </dd>
-<dt id="pgm.distributions.Continuous.likelihood"><code class="name flex">
-<span>def <span class="ident">likelihood</span></span>(<span>self, evidence: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
+<dt id="pgm.distributions.Continuous.pdf"><code class="name flex">
+<span>def <span class="ident">pdf</span></span>(<span>self, evidence: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Computes likelihood of the observed data.</p>
@@ -292,7 +292,7 @@ scalar.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abc.abstractmethod
-def likelihood(self, evidence: np.ndarray) -&gt; Union[np.ndarray, float]:
+def pdf(self, evidence: np.ndarray) -&gt; Union[np.ndarray, float]:
     &#34;&#34;&#34;Computes likelihood of the observed data.
 
     Args:
@@ -529,8 +529,8 @@ def mean(self) -&gt; np.ndarray:
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="pgm.distributions.Gaussian.cdf_probability"><code class="name flex">
-<span>def <span class="ident">cdf_probability</span></span>(<span>self, target: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
+<dt id="pgm.distributions.Gaussian.cdf"><code class="name flex">
+<span>def <span class="ident">cdf</span></span>(<span>self, target: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Computes the probability of observing values smaller than <code>target</code>, i.e.
@@ -553,40 +553,9 @@ scalar.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def cdf_probability(self, target: np.ndarray) -&gt; Union[np.ndarray, float]:
+<pre><code class="python">def cdf(self, target: np.ndarray) -&gt; Union[np.ndarray, float]:
     re = self._sp.cdf(target)
     for axis in np.where(np.array(target.shape) == 1)[0]:
-        re = np.expand_dims(re, axis)
-    return re</code></pre>
-</details>
-</dd>
-<dt id="pgm.distributions.Gaussian.likelihood"><code class="name flex">
-<span>def <span class="ident">likelihood</span></span>(<span>self, evidence: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Computes likelihood of the observed data.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>evidence</code></strong> :&ensp;<code>np.ndarray</code></dt>
-<dd>Array of observed values of shape
-<code>(d1, d2, &hellip;, dn, N)</code>, with <code>N</code> denoting the distribution dimension.
-All operations are performed on the last axis only, allowing for batch
-processing.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>Union[np.ndarray, float]</code></dt>
-<dd>Likelihood of observed values. Either an array of
-shape <code>(d1, d2, &hellip;, dn)</code> or, if the input is of shape <code>(N, )</code>, a
-scalar.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def likelihood(self, evidence: np.ndarray) -&gt; Union[np.ndarray, float]:
-    re = self._sp.pdf(evidence)
-    for axis in np.where(np.array(evidence.shape) == 1)[0]:
         re = np.expand_dims(re, axis)
     return re</code></pre>
 </details>
@@ -615,6 +584,37 @@ Base: Marginalized distribution.</p></div>
         np.concatenate((self._mean[:axis], self._mean[axis+1:]), axis=0),
         new_cov,
     )</code></pre>
+</details>
+</dd>
+<dt id="pgm.distributions.Gaussian.pdf"><code class="name flex">
+<span>def <span class="ident">pdf</span></span>(<span>self, evidence: numpy.ndarray) ‑> Union[numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes likelihood of the observed data.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>evidence</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>Array of observed values of shape
+<code>(d1, d2, &hellip;, dn, N)</code>, with <code>N</code> denoting the distribution dimension.
+All operations are performed on the last axis only, allowing for batch
+processing.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Union[np.ndarray, float]</code></dt>
+<dd>Likelihood of observed values. Either an array of
+shape <code>(d1, d2, &hellip;, dn)</code> or, if the input is of shape <code>(N, )</code>, a
+scalar.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pdf(self, evidence: np.ndarray) -&gt; Union[np.ndarray, float]:
+    re = self._sp.pdf(evidence)
+    for axis in np.where(np.array(evidence.shape) == 1)[0]:
+        re = np.expand_dims(re, axis)
+    return re</code></pre>
 </details>
 </dd>
 <dt id="pgm.distributions.Gaussian.sample"><code class="name flex">
@@ -677,8 +677,8 @@ contains multiple samples stacked in the first dimension.</dd>
 <li>
 <h4><code><a title="pgm.distributions.Continuous" href="#pgm.distributions.Continuous">Continuous</a></code></h4>
 <ul class="">
-<li><code><a title="pgm.distributions.Continuous.cdf_probability" href="#pgm.distributions.Continuous.cdf_probability">cdf_probability</a></code></li>
-<li><code><a title="pgm.distributions.Continuous.likelihood" href="#pgm.distributions.Continuous.likelihood">likelihood</a></code></li>
+<li><code><a title="pgm.distributions.Continuous.cdf" href="#pgm.distributions.Continuous.cdf">cdf</a></code></li>
+<li><code><a title="pgm.distributions.Continuous.pdf" href="#pgm.distributions.Continuous.pdf">pdf</a></code></li>
 </ul>
 </li>
 <li>
@@ -694,11 +694,11 @@ contains multiple samples stacked in the first dimension.</dd>
 <li>
 <h4><code><a title="pgm.distributions.Gaussian" href="#pgm.distributions.Gaussian">Gaussian</a></code></h4>
 <ul class="two-column">
-<li><code><a title="pgm.distributions.Gaussian.cdf_probability" href="#pgm.distributions.Gaussian.cdf_probability">cdf_probability</a></code></li>
+<li><code><a title="pgm.distributions.Gaussian.cdf" href="#pgm.distributions.Gaussian.cdf">cdf</a></code></li>
 <li><code><a title="pgm.distributions.Gaussian.covariance" href="#pgm.distributions.Gaussian.covariance">covariance</a></code></li>
-<li><code><a title="pgm.distributions.Gaussian.likelihood" href="#pgm.distributions.Gaussian.likelihood">likelihood</a></code></li>
 <li><code><a title="pgm.distributions.Gaussian.marginalize" href="#pgm.distributions.Gaussian.marginalize">marginalize</a></code></li>
 <li><code><a title="pgm.distributions.Gaussian.mean" href="#pgm.distributions.Gaussian.mean">mean</a></code></li>
+<li><code><a title="pgm.distributions.Gaussian.pdf" href="#pgm.distributions.Gaussian.pdf">pdf</a></code></li>
 <li><code><a title="pgm.distributions.Gaussian.sample" href="#pgm.distributions.Gaussian.sample">sample</a></code></li>
 </ul>
 </li>
