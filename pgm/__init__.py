@@ -30,7 +30,7 @@ def _fix_pdoc():
         for obj in module.__all__:
             obj = eval(".".join(module_name) + f".{obj}")
             if not isinstance(obj, ModuleType):
-                obj.__module__ = "ai." + ".".join(module_name)
+                obj.__module__ = "pgm." + ".".join(module_name)
 
         for submodule in os.listdir(os.path.join(root, *module_name)):
             submodule_path = os.path.join(root, *module_name, submodule)
